@@ -1,58 +1,129 @@
-#include <iostream>
-#include <array>
-#include <vector>
-
-#define coordinate std::array<char, 2>
-#define piece unsigned char
-
-// Utility functions to deal with the colors of pieces
-#define WHITE_BITMASK 0b10000000
-inline bool isWhite(piece p)
-{
-    return (p & WHITE_BITMASK) > 0;
-}
-inline void setWhite(piece &p)
-{
-    p |= WHITE_BITMASK;
-}
-inline void setBlack(piece &p)
-{
-    p &= ~WHITE_BITMASK;
-}
-
-piece PAWN = 'p';
-piece BISHOP = 'b';
-piece KNIGHT = 'n';
-piece ROOK = 'r';
-piece QUEEN = 'q';
-piece KING = 'k';
-
-// Some constants for accessing information from State and Move classes
-const int KINGSIDE = 0;
-const int QUEENSIDE = 1;
-
-const int WHITE = 0;
-const int BLACK = 1;
+#include "main.h"
 
 class State
 {
-public:
-    unsigned char board[8][8];
-    bool whiteToMove;
-
-    bool movesMade;         // Full move number (for algebraic notation)
-    bool halfMovesMade;     // Number of turns taken by players (for 50 move repitition)
-    bool castleAvail[2][2]; // Whether castling is available
-                            // Accessed by castleAvail[color][side]
-
-    bool enPassantAvailable;      // If a length 2 pawn move was made last turn
-    coordinate enPassantLocation; // Which square can be taken via en passant
-
     std::vector<State> allPossibleMoves() const
     {
+        // Get all moves, including illegal ones
         std::vector<State> allMoves{};
+        for (int x = 0; x < 8; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+            }
+        }
+
+        // TODO filter out illegal moves (IE ones that leave the player in check)
 
         return allMoves;
+    }
+};
+
+class Piece
+{
+public:
+    virtual std::vector<State> legalMoves(State &state, coordinate position) const = 0;
+};
+
+class StandardPiece : Piece
+{
+protected:
+    virtual bool onlyOneMove() const = 0; // King and knight
+    virtual bool isDiagonal() const = 0;  // King, Queen, Bishop
+    virtual bool isVertical() const = 0;  // King, Queen, Rook
+
+public:
+    std::vector<State> legalMoves(State &state, coordinate position) const
+    {
+    }
+};
+
+class Bishop : StandardPiece
+{
+protected:
+    bool onlyOneMove()
+    {
+        return false;
+    }
+
+    bool isDiagonal()
+    {
+        return true;
+    }
+
+    bool isVertical()
+    {
+        return false;
+    }
+};
+
+class Rook : StandardPiece
+{
+    bool onlyOneMove()
+    {
+        return false;
+    }
+
+    bool isDiagonal()
+    {
+        return false;
+    }
+
+    bool isVertical()
+    {
+        return true;
+    }
+};
+
+class Queen : StandardPiece
+{
+    bool onlyOneMove()
+    {
+        return false;
+    }
+
+    bool isDiagonal()
+    {
+        return true;
+    }
+
+    bool isVertical()
+    {
+        return true;
+    }
+};
+
+class King : StandardPiece
+{
+    bool onlyOneMove()
+    {
+        return true;
+    }
+
+    bool isDiagonal()
+    {
+        return true;
+    }
+
+    bool isVertical()
+    {
+        return true;
+    }
+};
+
+class Knight : Piece
+{
+public:
+    std::vector<State> legalMoves(State &state, coordinate position) const
+    {
+    }
+};
+
+class Pawn : Piece
+{
+public:
+    std::vector<State> legalMoves(State &state, coordinate position) const
+    {
     }
 };
 
